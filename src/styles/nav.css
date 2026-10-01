@@ -1,0 +1,243 @@
+/* ============================================================
+   Gearly — Navbar, Search, Menu Drawer, Filter Bottom Sheet
+   Mobile-first: navbar compact + hamburger. Desktop ≥1024px: full.
+   ============================================================ */
+
+/* ---------- NAVBAR (mobile: compact) ---------- */
+.navbar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: var(--z-sticky);
+  height: var(--h-navbar);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding-inline: var(--sp-3);
+  background: var(--c-surface);
+  border-bottom: 1px solid var(--c-border);
+  /* tidak menutupi konten: tingginya dikompensasi body { padding-top } */
+}
+.navbar__brand {
+  font-weight: 800;
+  font-size: var(--fs-md);
+  color: var(--c-text);
+  white-space: nowrap;
+}
+.navbar__brand:hover { text-decoration: none; }
+
+.navbar__spacer { flex: 1; }
+
+/* Hamburger — touch target 44px */
+.icon-btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  width: var(--touch-target);
+  height: var(--touch-target);
+  min-width: var(--touch-target);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  color: var(--c-text);
+}
+.icon-btn:hover { background: var(--c-surface-alt); }
+
+/* Menu utama: TERSEMBUNYI di mobile → lewat drawer */
+.nav-links { display: none; }
+
+/* Badge jumlah compare */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding-inline: 5px;
+  border-radius: var(--r-full);
+  background: var(--c-danger);
+  color: #fff;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+}
+
+/* ---------- SEARCH ---------- */
+/* Mobile: search bar berada tepat DI BAWAH navbar, full-width */
+.searchbar {
+  position: sticky;
+  top: var(--h-navbar);
+  z-index: calc(var(--z-sticky) - 1);
+  background: var(--c-bg);
+  padding: var(--sp-2) var(--container-pad);
+}
+.search-form {
+  display: flex;
+  width: 100%;                        /* full-width di mobile */
+  gap: var(--sp-2);
+}
+.search-form .input { flex: 1; min-width: 0; }
+
+/* Tombol filter (pemicu bottom sheet) — hanya tampil < 1024px */
+.filter-toggle { display: inline-flex; }
+
+/* ---------- MENU DRAWER (mobile & tablet) ---------- */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-drawer);
+  background: var(--c-overlay);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
+}
+.overlay.is-open { opacity: 1; pointer-events: auto; }
+
+.drawer {
+  position: fixed;
+  top: 0; bottom: 0; left: 0;
+  z-index: calc(var(--z-drawer) + 1);
+  width: min(320px, 85vw);             /* jangan pernah melebihi layar */
+  background: var(--c-surface);
+  transform: translateX(-100%);
+  transition: transform .25s ease;
+  display: flex;
+  flex-direction: column;
+  padding: var(--sp-4);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.drawer.is-open { transform: translateX(0); }
+.drawer__title { font-size: var(--fs-md); font-weight: 700; margin-bottom: var(--sp-3); }
+.drawer a, .drawer button.menu-item {
+  display: flex;
+  align-items: center;
+  min-height: var(--touch-target);     /* tiap item mudah disentuh */
+  font-size: var(--fs-base);
+  color: var(--c-text);
+  border: 0; background: none;
+  padding: 0 var(--sp-2);
+  border-radius: var(--r-sm);
+  text-align: start;
+  width: 100%;
+  font-family: inherit;
+  cursor: pointer;
+}
+.drawer a:hover, .drawer button.menu-item:hover { background: var(--c-surface-alt); text-decoration: none; }
+
+/* ---------- FILTER: BOTTOM SHEET (mobile) ---------- */
+.bottom-sheet {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: calc(var(--z-drawer) + 1);
+  max-height: 75vh;                   /* iklan/konten tetap terlihat */
+  background: var(--c-surface);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  box-shadow: var(--shadow-3);
+  transform: translateY(105%);
+  transition: transform .28s ease;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: var(--safe-bottom);
+}
+.bottom-sheet.is-open { transform: translateY(0); }
+.bottom-sheet__handle {
+  width: 40px; height: 4px; border-radius: 2px;
+  background: var(--c-border);
+  margin: var(--sp-2) auto 0;
+}
+.bottom-sheet__header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--c-border);
+}
+.bottom-sheet__body {
+  padding: var(--sp-4);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.bottom-sheet__footer {
+  display: flex; gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  border-top: 1px solid var(--c-border);
+}
+.bottom-sheet__footer .btn { flex: 1; }
+
+/* Kelompok filter */
+.filter-group { margin-bottom: var(--sp-4); }
+.filter-group__title { font-weight: 700; font-size: var(--fs-sm); margin-bottom: var(--sp-2); }
+.filter-option {
+  display: flex; align-items: center; gap: var(--sp-2);
+  min-height: var(--touch-target);    /* area label = target sentuh */
+  font-size: var(--fs-sm);
+  cursor: pointer;
+}
+.filter-option input[type="checkbox"],
+.filter-option input[type="radio"] {
+  width: 20px; height: 20px;           /* kontrol besar utk sentuh */
+  accent-color: var(--c-primary);
+  flex-shrink: 0;
+}
+
+/* ---------- SIDEBAR FILTER (desktop ≥1024px) ---------- */
+.filter-sidebar { display: none; }     /* mobile: pakai bottom sheet */
+
+@media (min-width: 1024px) {
+  /* Navbar penuh: brand + menu horizontal + search membesar */
+  .navbar { padding-inline: var(--sp-5); }
+  .navbar__menu-btn { display: none; } /* tanpa hamburger */
+  .nav-links {
+    display: flex;
+    gap: var(--sp-1);
+    align-items: center;
+  }
+  .nav-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch-target);
+    padding: 0 var(--sp-3);
+    border-radius: var(--r-sm);
+    color: var(--c-text);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+  .nav-links a:hover { background: var(--c-surface-alt); text-decoration: none; }
+  .nav-links a[aria-current="page"] { color: var(--c-primary); }
+
+  /* Search lebih besar, sejajar dalam navbar.
+     .searchbar adalah anak langsung .navbar → flex item ikut tinggi navbar. */
+  .searchbar {
+    position: static;                  /* tidak perlu sticky lagi di desktop */
+    align-self: center;
+    width: auto;
+    padding: 0 var(--sp-3);
+    background: transparent;
+    min-width: 320px;                  /* search tetap lega & tidak tergencet */
+    flex: 1 1 560px;                   /* membesar di desktop sampai batas ideal */
+  }
+  .searchbar .container { padding-inline: 0; }
+
+  /* Pemicu bottom sheet tidak diperlukan lagi */
+  .filter-toggle { display: none; }
+
+  /* Sidebar filter persisten di kiri */
+  .filter-sidebar {
+    display: block;
+    position: sticky;
+    top: calc(var(--h-navbar) + var(--sp-4));
+    width: 260px;
+    flex-shrink: 0;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    padding: var(--sp-4);
+    max-height: calc(100vh - var(--h-navbar) - var(--sp-6));
+    overflow-y: auto;
+  }
+}
+
+/* Landscape smartphone pendek (mis. HP 844px tinggi): kurangi tinggi sticky */
+@media (max-height: 460px) and (orientation: landscape) {
+  :root { --h-navbar: 48px; }
+  .bottom-sheet { max-height: 90vh; }
+}

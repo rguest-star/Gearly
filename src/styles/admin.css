@@ -1,0 +1,156 @@
+/* ============================================================
+   Gearly — Admin Dashboard (sidebar desktop, drawer mobile)
+   & Footer. Mobile-first.
+   ============================================================ */
+
+/* ---------- ADMIN LAYOUT ---------- */
+.admin {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.admin__nav { display: none; }         /* mobile: nav lewat menu drawer utama */
+
+.admin__content { min-width: 0; }      /* cegah tabel admin merobek layout */
+
+/* Kartu statistik: 1 kolom → 2 kolom (HP lebar/tablet) → 4 kolom (desktop) */
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-3);
+}
+@media (min-width: 400px) { .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .stat-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-4); } }
+
+.stat-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+}
+.stat-card__value { font-size: var(--fs-xl); font-weight: 800; }
+.stat-card__label { font-size: var(--fs-sm); color: var(--c-text-muted); }
+
+/* Panel form admin: satu kolom di mobile, dua kolom di tablet ke atas */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-3);
+}
+@media (min-width: 640px) { .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .form-grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.field label { display: block; font-size: var(--fs-sm); font-weight: 600; margin-bottom: var(--sp-1); }
+.field .input { width: 100%; }
+
+/* Tabel data admin: HORIZONTAL SCROLL di layar kecil, bukan merusak layout */
+.data-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  background: var(--c-surface);
+}
+table.data-table {
+  width: 100%;
+  min-width: 640px;                    /* kolom tetap terbaca saat digulir */
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+}
+.data-table th, .data-table td {
+  padding: var(--sp-3) var(--sp-4);
+  text-align: start;
+  border-bottom: 1px solid var(--c-border);
+  white-space: nowrap;                 /* baris rapi; pengguna menggulir horizontal */
+}
+.data-table tbody tr:hover { background: var(--c-surface-alt); }
+.data-table .actions { display: flex; gap: var(--sp-1); }
+
+/* Aksi baris admin tetap ≥44px bila disentuh */
+.row-btn {
+  min-width: var(--touch-target);
+  min-height: var(--touch-target);
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--c-border);
+  background: var(--c-surface);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  font: inherit; font-size: var(--fs-xs);
+  padding-inline: var(--sp-2);
+}
+.row-btn:hover { border-color: var(--c-primary); color: var(--c-primary); }
+.row-btn.danger:hover { border-color: var(--c-danger); color: var(--c-danger); }
+
+/* ---------- DESKTOP: sidebar admin ---------- */
+@media (min-width: 1024px) {
+  .admin { flex-direction: row; align-items: flex-start; gap: var(--sp-5); }
+
+  .admin__nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    width: 232px;
+    flex-shrink: 0;
+    position: sticky;
+    top: calc(var(--h-navbar) + var(--sp-4));
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    padding: var(--sp-3);
+  }
+  .admin__nav a {
+    display: flex; align-items: center; gap: var(--sp-2);
+    min-height: var(--touch-target);
+    padding-inline: var(--sp-3);
+    border-radius: var(--r-sm);
+    color: var(--c-text);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+  .admin__nav a:hover { background: var(--c-surface-alt); text-decoration: none; }
+  .admin__nav a[aria-current="page"] { background: var(--c-primary); color: var(--c-on-primary); }
+
+  .admin__content { flex: 1; min-width: 0; }
+}
+
+/* Large desktop: dashboard pakai multi-column, tapi terkunci container */
+@media (min-width: 1440px) {
+  .admin__nav { width: 260px; }
+  .dashboard-widgets {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--sp-4);
+    align-items: start;
+  }
+}
+@media (max-width: 1439px) {
+  .dashboard-widgets { display: flex; flex-direction: column; gap: var(--sp-4); }
+}
+
+.widget {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+}
+.widget__title { font-size: var(--fs-base); font-weight: 700; margin: 0 0 var(--sp-3); }
+
+/* ---------- FOOTER ---------- */
+.footer {
+  margin-top: var(--sp-7);
+  background: var(--c-surface);
+  border-top: 1px solid var(--c-border);
+  padding-block: var(--sp-5);
+  font-size: var(--fs-sm);
+  color: var(--c-text-muted);
+}
+.footer__cols {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-4);
+}
+@media (min-width: 640px) { .footer__cols { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .footer__cols { grid-template-columns: repeat(4, 1fr); } }
+.footer h3 { font-size: var(--fs-sm); color: var(--c-text); text-transform: uppercase; letter-spacing: .05em; }
+.footer ul { list-style: none; margin: 0; padding: 0; }
+.footer li { min-height: var(--touch-target); display: flex; align-items: center; }

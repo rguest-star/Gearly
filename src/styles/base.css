@@ -1,0 +1,120 @@
+/* ============================================================
+   Gearly — Base & Layout (MOBILE-FIRST)
+   Default style = 320px ke atas. Media query hanya min-width.
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;      /* iPhone landscape tidak mengubah ukuran font */
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);           /* 16px di semua ukuran layar */
+  line-height: 1.55;
+  color: var(--c-text);
+  background: var(--c-bg);
+  /* Cegah horizontal overflow global */
+  overflow-x: hidden;
+  padding-top: var(--h-navbar);        /* konten tidak tertutup navbar sticky */
+  padding-bottom: calc(var(--h-compare-bar) + var(--safe-bottom) + var(--sp-2));
+}
+
+/* ---------- Anti horizontal-overflow ---------- */
+img, video, svg, canvas {
+  max-width: 100%;
+  height: auto;                        /* gambar otomatis responsive */
+  display: block;
+}
+iframe { max-width: 100%; }
+pre, code { white-space: pre-wrap; word-break: break-word; }
+body, .container { overflow-wrap: break-word; }
+
+/* ---------- Container dengan max-width konsisten ---------- */
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+/* ---------- Typography ---------- */
+h1, h2, h3 { line-height: 1.25; margin: 0 0 var(--sp-3); }
+h1 { font-size: var(--fs-xl); }       /* mobile: 24px — cukup besar, tanpa zoom */
+h2 { font-size: var(--fs-lg); }
+h3 { font-size: var(--fs-md); }
+p  { margin: 0 0 var(--sp-3); }
+a  { color: var(--c-primary); text-decoration: none; }
+a:hover, a:focus-visible { text-decoration: underline; }
+
+@media (min-width: 1024px) {
+  h1 { font-size: var(--fs-2xl); }
+}
+
+/* ---------- Tombol — touch target ≥ 44px ---------- */
+.btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-height: var(--touch-target);     /* 44px */
+  min-width: var(--touch-target);
+  padding: 0 var(--sp-4);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .15s ease, transform .05s ease;
+}
+.btn:active { transform: scale(.98); }
+.btn-primary { background: var(--c-primary); color: var(--c-on-primary); }
+.btn-primary:hover { background: var(--c-primary-dark); }
+.btn-outline { background: var(--c-surface); color: var(--c-text); border-color: var(--c-border); }
+.btn-outline:hover { border-color: var(--c-primary); color: var(--c-primary); }
+.btn-ghost { background: transparent; color: var(--c-text-muted); }
+.btn-block { width: 100%; }            /* mobile: tombol full-width mudah disentuh */
+.btn-sm { min-height: 36px; font-size: var(--fs-xs); } /* hanya utk dense UI desktop */
+
+@media (min-width: 1024px) {
+  .btn-block { width: auto; }          /* desktop: tombol mengikuti isi */
+}
+
+/* Field input minimal setinggi touch target */
+.input, select.input {
+  min-height: var(--touch-target);
+  font: inherit;
+  font-size: var(--fs-base);           /* ≥16px mencegah auto-zoom iOS saat focus */
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-sm);
+  background: var(--c-surface);
+  color: var(--c-text);
+  width: 100%;
+}
+.input:focus { outline: 2px solid var(--c-primary); outline-offset: 1px; }
+
+/* ---------- Aksesibilitas ---------- */
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0; clip: rect(0 0 0 0);
+  clip-path: inset(50%); overflow: hidden; white-space: nowrap;
+}
+:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- Utility: lock scroll saat drawer/bottom sheet terbuka ---------- */
+body.has-overlay { overflow: hidden; }

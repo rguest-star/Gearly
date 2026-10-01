@@ -1,0 +1,220 @@
+/* ============================================================
+   Gearly — Product Detail, Spec Table, Comparison Table
+   Mobile-first: semuanya menumpuk vertikal; tabel pakai scroll.
+   ============================================================ */
+
+/* ---------- HERO DETAIL ----------
+   MOBILE (default): 1 kolom vertikal yang nyaman
+     Product Image
+     Product Name / Brand / Price / Key Specs / Compare
+------------------------------------*/
+.detail { display: flex; flex-direction: column; gap: var(--sp-4); }
+
+.detail__media {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-3);
+}
+.detail__main-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  max-height: 60vh;                    /* HP landscape pendek: gambar tak mendorong CTA keluar layar */
+}
+.detail__thumbs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}
+.detail__thumbs img {
+  width: 100%; aspect-ratio: 1/1; object-fit: contain;
+  border: 1px solid var(--c-border); border-radius: var(--r-sm);
+  cursor: pointer; padding: 4px;
+}
+.detail__thumbs img[aria-current="true"] { border-color: var(--c-primary); outline: 2px solid var(--c-primary); }
+
+.detail__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+}
+.detail__brand { font-size: var(--fs-sm); color: var(--c-text-muted); text-transform: uppercase; letter-spacing: .05em; font-weight: 700; }
+.detail__title { font-size: var(--fs-xl); margin: 0; }
+.detail__price { font-size: var(--fs-xl); font-weight: 800; }
+.detail__rating { display: flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-sm); color: var(--c-text-muted); }
+.stars { color: var(--c-star); letter-spacing: 2px; }
+
+/* Daftar spesifikasi kunci — dua kolom sempit di HP kecil tetap terbaca */
+.keyspecs { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-2); }
+.keyspecs li {
+  display: flex; justify-content: space-between; gap: var(--sp-3);
+  font-size: var(--fs-sm);
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px dashed var(--c-border);
+}
+.keyspecs dt, .keyspecs .k { color: var(--c-text-muted); flex-shrink: 0; }
+.keyspecs .v { font-weight: 600; text-align: end; overflow-wrap: anywhere; } /* nilai panjang tidak merobek layout */
+
+.detail__actions { display: flex; flex-direction: column; gap: var(--sp-2); }
+
+/* Sticky CTA mobile — selalu terjangkau, tapi TIDAK menutupi konten
+   (body sudah punya padding-bottom utk compare bar) */
+@media (min-width: 1024px) {
+  /* DESKTOP: [Image | Information] berdampingan */
+  .detail {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--sp-6);
+  }
+  .detail__media { flex: 0 0 45%; position: sticky; top: calc(var(--h-navbar) + var(--sp-4)); }
+  .detail__info  { flex: 1; min-width: 0; padding: var(--sp-5); }
+  .detail__title { font-size: var(--fs-2xl); }
+  .detail__actions { flex-direction: row; }
+  .detail__actions .btn { flex: 0 0 auto; }
+}
+@media (min-width: 1440px) {
+  .detail__media { flex-basis: 40%; }  /* layar besar: info lebih lega, gambar tak membesar liar */
+}
+
+/* ---------- TABEL SPESIFIKASI ----------
+   Aturan: TIDAK boleh overflow buruk.
+   - Mobile : definisi-per-baris (label di atas nilai) → tanpa scroll sama sekali
+   - ≥768px : tabel 2 kolom nyata
+   - ≥1024px: 2 kolom lebar penuh + header grup menempel kiri (sticky col saat scroll)
+--------------------------------------------*/
+.spec-table-wrap {
+  overflow-x: auto;                    /* jaring pengaman terakhir */
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  background: var(--c-surface);
+}
+table.spec-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+  min-width: 0;                        /* jangan paksa lebar; biarkan wrap */
+}
+.spec-table caption {
+  text-align: start;
+  padding: var(--sp-3) var(--sp-4);
+  font-weight: 700;
+  font-size: var(--fs-base);
+  border-bottom: 1px solid var(--c-border);
+}
+.spec-table th, .spec-table td {
+  padding: var(--sp-3) var(--sp-4);
+  text-align: start;
+  vertical-align: top;
+  border-bottom: 1px solid var(--c-border);
+  overflow-wrap: anywhere;             /* teks panjang (mis. "Dimensi") tidak merusak kolom */
+}
+.spec-table th { width: 38%; color: var(--c-text-muted); font-weight: 600; background: var(--c-surface-alt); }
+.spec-table tr:last-child th, .spec-table tr:last-child td { border-bottom: 0; }
+.spec-table .group-row td {
+  background: var(--c-surface-alt);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  font-size: var(--fs-xs);
+  color: var(--c-text-muted);
+}
+
+/* Mobile (<768px): render tabel sebagai daftar label→nilai agar tak overflow.
+   Mobile-first: gaya daftar = default; tabel nyata di-restorasi mulai 768px. */
+table.spec-table thead { display: none; }
+table.spec-table, .spec-table tbody, .spec-table tr, .spec-table th, .spec-table td { display: block; width: 100%; }
+.spec-table tr { padding: var(--sp-3) var(--sp-4); }
+.spec-table th { background: transparent; padding: 0 0 2px; font-size: var(--fs-xs); }
+.spec-table td { padding: 0; border: 0; font-size: var(--fs-base); } /* nilai 16px → terbaca tanpa zoom */
+.spec-table .group-row td { padding: var(--sp-2) 0; background: transparent; }
+
+@media (min-width: 768px) {
+  table.spec-table thead { display: table-header-group; }
+  table.spec-table { display: table; }
+  .spec-table tbody { display: table-row-group; }
+  .spec-table tr { display: table-row; padding: 0; }
+  .spec-table th, .spec-table td { display: table-cell; width: auto; }
+}
+
+/* ---------- TABEL PERBANDINGAN ----------
+   Selalu melebar (banyak kolom produk). Solusi: horizontal scroll
+   dengan kolom pertama (nama atribut) sticky di kiri.
+------------------------------------------------*/
+.compare-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  background: var(--c-surface);
+  /* petunjuk visual ada konten di kanan */
+  box-shadow: inset -12px 0 12px -12px rgba(16,22,34,.25);
+}
+table.compare-table {
+  border-collapse: separate;           /* required agar sticky cell bg tidak bocor */
+  border-spacing: 0;
+  font-size: var(--fs-sm);
+  width: max-content;                  /* kolom selebar isinya, digulir bila perlu */
+  min-width: 100%;
+}
+.compare-table th, .compare-table td {
+  padding: var(--sp-3);
+  border-bottom: 1px solid var(--c-border);
+  text-align: start;
+  min-width: 140px;                    /* kolom produk tidak tergencet jadi tak terbaca */
+  max-width: var(--w-chip);            /* 240px */
+  overflow-wrap: anywhere;
+}
+.compare-table thead th {
+  position: sticky; top: 0;
+  background: var(--c-surface);
+  z-index: 2;
+  font-size: var(--fs-base);
+}
+.compare-table .attr-col {
+  position: sticky; left: 0;
+  background: var(--c-surface-alt);
+  font-weight: 600;
+  color: var(--c-text-muted);
+  z-index: 3;
+  min-width: 120px;
+  max-width: var(--w-chip-sm);         /* 160px */
+  width: 130px;
+}
+.compare-table thead .attr-col { z-index: 4; }
+.compare-table .winner { color: var(--c-accent); font-weight: 800; }
+.compare-table .thumb { width: 96px; height: 96px; object-fit: contain; }
+
+/* Mobile-first: tampilan ringkas = default (HP). Melebah ke atas. */
+.compare-table th, .compare-table td { min-width: 120px; padding: var(--sp-2); }
+.compare-table .thumb { width: 64px; height: 64px; }
+.compare-table thead th { font-size: var(--fs-sm); }
+
+@media (min-width: 640px) {
+  /* ≥ tablet portrait: kembali ke ukuran longgar */
+  .compare-table th, .compare-table td { min-width: 140px; padding: var(--sp-3); }
+  .compare-table .thumb { width: 96px; height: 96px; }
+  .compare-table thead th { font-size: var(--fs-base); }
+}
+
+/* Desktop besar: ruang dipakai optimal — kolom melebar sampai batas container */
+@media (min-width: 1024px) {
+  table.compare-table { width: 100%; }
+  .compare-table th, .compare-table td { min-width: 160px; }
+}
+@media (min-width: 1440px) {
+  .compare-table th, .compare-table td { padding: var(--sp-4); font-size: var(--fs-base); }
+}
+
+.scroll-hint {
+  font-size: var(--fs-xs);
+  color: var(--c-text-muted);
+  margin-top: var(--sp-2);
+}
+@media (min-width: 1024px) { .scroll-hint { display: none; } }

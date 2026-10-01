@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="Admin dashboard Gearly — sidebar di desktop, drawer di mobile." />
+  <title>Admin — Gearly</title>
+  <link rel="stylesheet" href="src/styles/tokens.css" />
+  <link rel="stylesheet" href="src/styles/base.css" />
+  <link rel="stylesheet" href="src/styles/nav.css" />
+  <link rel="stylesheet" href="src/styles/product.css" />
+  <link rel="stylesheet" href="src/styles/detail.css" />
+  <link rel="stylesheet" href="src/styles/admin.css" />
+</head>
+<body>
+
+  <header class="navbar">
+    <a class="navbar__brand" href="index.html">⚙ Gearly</a>
+    <nav class="nav-links" aria-label="Navigasi utama">
+      <a href="index.html">Katalog</a>
+      <a href="compare.html">Perbandingan</a>
+      <a href="admin.html" aria-current="page">Admin</a>
+    </nav>
+    <span class="navbar__spacer"></span>
+    <button class="icon-btn navbar__menu-btn" data-open="menu"
+            aria-label="Buka menu navigasi" aria-controls="menu-drawer">☰</button>
+  </header>
+
+  <div class="overlay" aria-hidden="true"></div>
+  <!-- Di mobile, navigasi admin masuk ke menu drawer -->
+  <nav id="menu-drawer" class="drawer" aria-label="Menu navigasi" aria-hidden="true">
+    <div class="drawer__title">Admin</div>
+    <a href="index.html">← Kembali ke katalog</a>
+    <a href="#ringkasan">Ringkasan</a>
+    <a href="#produk">Produk</a>
+    <a href="#tambah">Tambah produk</a>
+    <a href="#ulasan">Ulasan</a>
+    <button class="menu-item" data-close="menu-drawer">Tutup</button>
+  </nav>
+
+  <main class="container" style="padding-top:var(--sp-4)">
+    <h1>Admin Dashboard</h1>
+
+    <div class="admin">
+      <!-- SIDEBAR NAV (desktop ≥1024px; di mobile lewat drawer) -->
+      <nav class="admin__nav" aria-label="Navigasi dashboard">
+        <a href="#ringkasan" aria-current="page">📊 Ringkasan</a>
+        <a href="#produk">📦 Produk</a>
+        <a href="#tambah">➕ Tambah produk</a>
+        <a href="#ulasan">⭐ Ulasan</a>
+        <a href="#pengaturan">⚙ Pengaturan</a>
+      </nav>
+
+      <div class="admin__content">
+        <section id="ringkasan" aria-labelledby="t-ringkasan">
+          <h2 id="t-ringkasan">Ringkasan</h2>
+          <div class="stat-grid">
+            <div class="stat-card"><div class="stat-card__value">128</div><div class="stat-card__label">Total produk</div></div>
+            <div class="stat-card"><div class="stat-card__value">36</div><div class="stat-card__label">Menunggu ulasan</div></div>
+            <div class="stat-card"><div class="stat-card__value">9.4rb</div><div class="stat-card__label">Kunjungan / hari</div></div>
+            <div class="stat-card"><div class="stat-card__value">212</div><div class="stat-card__label">Perbandingan / hari</div></div>
+          </div>
+        </section>
+
+        <div class="dashboard-widgets" style="margin-top:var(--sp-5)">
+          <section id="produk" class="widget" aria-labelledby="t-produk">
+            <h2 id="t-produk" class="widget__title">Daftar produk</h2>
+            <!-- Tabel data: horizontal scroll di layar kecil agar tidak overflow buruk -->
+            <div class="data-table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th scope="col">ID</th><th scope="col">Merek</th><th scope="col">Nama</th>
+                    <th scope="col">Kategori</th><th scope="col">Harga</th><th scope="col">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-products"><!-- diisi JS --></tbody>
+              </table>
+            </div>
+            <p class="scroll-hint">↔ Geser tabel ke samping.</p>
+          </section>
+
+          <section id="ulasan" class="widget" aria-labelledby="t-ulasan">
+            <h2 id="t-ulasan" class="widget__title">Ulasan terbaru</h2>
+            <ul style="margin:0;padding-left:1.1em;font-size:var(--fs-sm);display:grid;gap:var(--sp-2)">
+              <li>“Baterai awet” — Note 14 Pro ★★★★☆</li>
+              <li>“ANC mantap” — NexaPods ★★★★★</li>
+              <li>“Layar tajam” — Aurora Nine ★★★★☆</li>
+            </ul>
+          </section>
+        </div>
+
+        <section id="tambah" class="widget" style="margin-top:var(--sp-5)" aria-labelledby="t-tambah">
+          <h2 id="t-tambah" class="widget__title">Tambah produk</h2>
+          <!-- form-grid: 1 kolom di HP, 2–3 kolom di tablet/desktop -->
+          <form class="form-grid" onsubmit="event.preventDefault(); GearlyUI.toast('Produk disimpan (demo).');">
+            <div class="field"><label for="f-brand">Merek</label><input id="f-brand" class="input" required></div>
+            <div class="field"><label for="f-name">Nama produk</label><input id="f-name" class="input" required></div>
+            <div class="field"><label for="f-cat">Kategori</label>
+              <select id="f-cat" class="input">
+                <option>smartphone</option><option>audio</option><option>wearable</option><option>aksesori</option>
+              </select>
+            </div>
+            <div class="field"><label for="f-price">Harga (Rp)</label>
+              <input id="f-price" class="input" type="number" inputmode="numeric" min="0" step="1000" required></div>
+            <div class="field" style="grid-column:1/-1"><label for="f-img">URL gambar</label>
+              <input id="f-img" class="input" type="url" placeholder="https://…"></div>
+            <div style="grid-column:1/-1;display:flex;gap:var(--sp-2);flex-wrap:wrap">
+              <button class="btn btn-primary btn-block" type="submit">Simpan</button>
+              <button class="btn btn-outline btn-block" type="reset">Bersihkan</button>
+            </div>
+          </form>
+        </section>
+
+        <section id="pengaturan" class="widget" style="margin-top:var(--sp-5)">
+          <h2 class="widget__title">Pengaturan iklan</h2>
+          <label class="filter-option"><input type="checkbox" checked> Tampilkan banner sticky di mobile (tinggi maks 90px, konten diberi padding kompensasi)</label>
+          <label class="filter-option"><input type="checkbox" checked> Tampilkan iklan dalam-sidebar di desktop</label>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container"><p>Gearly Admin · layout mengikuti lebar layar, bukan nama device.</p></div>
+  </footer>
+
+  <script src="src/data/products.js"></script>
+  <script src="src/js/ui.js"></script>
+  <script>
+    (function () {
+      var tb = document.getElementById("admin-products");
+      if (!tb) return;
+      tb.innerHTML = (window.GEARLY_PRODUCTS || []).map(function (p) {
+        return '<tr><td>' + p.id + '</td><td>' + p.brand + '</td><td>' + p.name +
+          '</td><td>' + p.category + '</td><td>' + window.GEARLY_FORMAT_IDR(p.price) +
+          '</td><td><div class="actions">' +
+          '<a class="row-btn" href="detail.html?id=' + p.id + '" aria-label="Lihat ' + p.name + '">Lihat</a>' +
+          '<button class="row-btn" type="button">Edit</button>' +
+          '<button class="row-btn danger" type="button">Hapus</button>' +
+          '</div></td></tr>';
+      }).join("");
+    })();
+  </script>
+</body>
+</html>

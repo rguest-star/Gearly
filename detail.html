@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="Detail produk & tabel spesifikasi — Gearly." />
+  <title>Detail Produk — Gearly</title>
+  <link rel="stylesheet" href="src/styles/tokens.css" />
+  <link rel="stylesheet" href="src/styles/base.css" />
+  <link rel="stylesheet" href="src/styles/nav.css" />
+  <link rel="stylesheet" href="src/styles/product.css" />
+  <link rel="stylesheet" href="src/styles/detail.css" />
+  <link rel="stylesheet" href="src/styles/admin.css" />
+</head>
+<body>
+
+  <header class="navbar">
+    <button class="icon-btn" onclick="history.back()" aria-label="Kembali ke halaman sebelumnya">←</button>
+    <a class="navbar__brand" href="index.html">⚙ Gearly</a>
+    <nav class="nav-links" aria-label="Navigasi utama">
+      <a href="index.html">Katalog</a>
+      <a href="compare.html">Perbandingan</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+    <span class="navbar__spacer"></span>
+    <div class="searchbar" role="search">
+      <form class="search-form" action="index.html" method="get">
+        <label class="visually-hidden" for="search-input">Cari produk atau merek</label>
+        <input id="search-input" class="input" type="search" name="q" placeholder="Cari produk …" />
+      </form>
+    </div>
+    <button class="icon-btn navbar__menu-btn" data-open="menu"
+            aria-label="Buka menu navigasi" aria-controls="menu-drawer">☰</button>
+  </header>
+
+  <div class="overlay" aria-hidden="true"></div>
+  <nav id="menu-drawer" class="drawer" aria-label="Menu navigasi" aria-hidden="true">
+    <div class="drawer__title">Menu</div>
+    <a href="index.html">Katalog</a>
+    <a href="compare.html">Perbandingan</a>
+    <a href="admin.html">Admin Dashboard</a>
+    <button class="menu-item" data-close="menu-drawer">Tutup</button>
+  </nav>
+
+  <!--
+    Layout detail:
+      DESKTOP (≥1024px): [ Product Image | Product Information ] berdampingan
+      MOBILE (<1024px) : gambar lalu informasi tersusun VERTIKAL yang nyaman
+    Isi di-render oleh src/js/render.js ke #detail-root.
+  -->
+  <main class="container" id="detail-root" style="padding-top:var(--sp-4)">
+    <noscript>
+      <p>Aktifkan JavaScript untuk melihat detail produk, atau buka daftar di
+         <a href="index.html">katalog</a>.</p>
+    </noscript>
+  </main>
+
+  <div class="compare-bar" role="region" aria-label="Produk yang dibandingkan">
+    <div class="compare-bar__items"></div>
+    <span class="compare-bar__count">0/4</span>
+    <span class="compare-bar__cta"><a class="btn btn-primary" href="compare.html">Bandingkan</a></span>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Gearly · Web spesifikasi elektronik · Mobile-first hingga 4K.</p>
+    </div>
+  </footer>
+
+  <script src="src/data/products.js"></script>
+  <script src="src/js/render.js"></script>
+  <script src="src/js/ui.js"></script>
+</body>
+</html>

@@ -1,0 +1,293 @@
+/* ============================================================
+   Gearly — Product Grid, Product Card, Compare Bar, Ads
+   Mobile-first: 1 kolom (2 hanya utk layar lebar), card vertikal.
+   ============================================================ */
+
+/* ---------- LAYOUT HALAMAN KATALOG ---------- */
+.catalog-layout { display: flex; flex-direction: column; gap: var(--sp-4); }
+
+@media (min-width: 1024px) {
+  .catalog-layout { flex-direction: row; align-items: flex-start; }
+  .catalog-main { flex: 1; min-width: 0; } /* min-width:0 mencegah grid mendorong overflow */
+}
+
+/* ---------- PRODUCT GRID ----------
+   Prinsip: jumlah kolom mengikuti LEBAR, bukan nama device.
+   - <400px            : 1 kolom (HP kecil 320–390px → card lega)
+   - 400–639px         : 2 kolom (mayoritas smartphone modern)
+   - 640–1023px        : 2–3 kolom (tablet portrait/landscape)
+   - ≥1024px           : 3 kolom + sidebar filter (desktop)
+   - ≥1280px           : 4 kolom
+   - ≥1440px           : 4 kolom, gap membesar (bukan card tak berbatas)
+-------------------------------------*/
+.product-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+@media (min-width: 400px) {
+  .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 768px) {
+  .product-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+}
+@media (min-width: 1024px) {
+  .product-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: var(--sp-4); }
+}
+@media (min-width: 1440px) {
+  .product-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--sp-5); }
+}
+/* Monitor 4K: batasi jumlah kolom agar card tidak terlalu melebar */
+@media (min-width: 1920px) {
+  .product-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* ---------- PRODUCT CARD ----------
+   MOBILE (default): kartu VERTIKAL
+     [IMAGE]
+      Brand
+      Product Name
+      Key Specification
+      Price
+      Compare
+------------------------------------*/
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-1);
+  transition: box-shadow .15s ease, transform .15s ease;
+  min-width: 0;                        /* isi panjang tidak merobek grid */
+  height: 100%;                        /* tinggi card konsisten per baris */
+}
+.card:hover { box-shadow: var(--shadow-2); transform: translateY(-2px); }
+
+.card__media {
+  position: relative;
+  aspect-ratio: 4 / 3;                 /* rasio gambar konsisten */
+  background: var(--c-surface-alt);
+}
+.card__media img {
+  width: 100%; height: 100%;
+  object-fit: contain;                 /* spesifikasi gadget utuh, tidak terpotong */
+  padding: var(--sp-2);
+}
+.card__flag {
+  position: absolute; top: var(--sp-2); left: var(--sp-2);
+  background: var(--c-accent); color: #fff;
+  font-size: var(--fs-xs); font-weight: 700;
+  padding: 2px 8px; border-radius: var(--r-full);
+}
+
+.card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding: var(--sp-3);
+  flex: 1;
+  min-width: 0;
+}
+.card__brand {
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--c-text-muted);
+  font-weight: 700;
+}
+.card__title {
+  font-size: var(--fs-base);           /* tetap terbaca tanpa zoom */
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.3;
+  /* maksimal 2 baris agar tinggi card seragam */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.card__specs {
+  font-size: var(--fs-sm);
+  color: var(--c-text-muted);
+  margin: 0;
+  /* kunci tinggi: selalu 2 baris → posisi price & compare sejajar antar card */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.6em;
+}
+.card__price {
+  font-size: var(--fs-md);
+  font-weight: 800;
+  margin-top: auto;                    /* harga & aksi selalu di dasar card */
+}
+.card__price small { font-weight: 500; color: var(--c-text-muted); font-size: var(--fs-xs); }
+
+.card__actions {
+  display: flex;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}
+.card__actions .btn { flex: 1; }       /* tombol lebar = mudah disentuh */
+
+/* Keadaan "sedang dibandingkan" */
+.btn-compare[aria-pressed="true"] {
+  background: var(--c-primary);
+  color: var(--c-on-primary);
+  border-color: var(--c-primary);
+}
+
+/* ---------- DESKTOP: kartu HORIZONTAL ----------
+   [IMAGE] Product Name
+           Brand
+           Key Specifications
+           Price
+           Compare
+   Aktif saat grid punya ruang lebih (≥1280px, tanpa sidebar sempit).
+---------------------------------------------------*/
+@media (min-width: 1280px) {
+  .card--horizontal {
+    flex-direction: row;
+    align-items: stretch;
+  }
+  .card--horizontal .card__media {
+    width: 180px;
+    flex-shrink: 0;
+    aspect-ratio: 1 / 1;
+  }
+  .card--horizontal .card__body { padding: var(--sp-4); }
+  .card--horizontal .card__actions { justify-content: flex-start; }
+  .card--horizontal .card__actions .btn { flex: 0 0 auto; min-width: 132px; }
+}
+
+/* Tablet landscape: 2 kolom horizontal ringan */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .card--horizontal .card__media { width: 140px; }
+  .card--horizontal { flex-direction: row; }
+  .card--horizontal .card__body { padding: var(--sp-3); }
+}
+
+/* ---------- COMPARE BAR (sticky, usable di layar kecil) ---------- */
+.compare-bar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: var(--z-sticky);
+  min-height: var(--h-compare-bar);
+  background: var(--c-surface);
+  border-top: 1px solid var(--c-border);
+  box-shadow: 0 -4px 16px rgba(16,22,34,.12);
+  padding: var(--sp-2) var(--sp-3);
+  padding-bottom: calc(var(--sp-2) + var(--safe-bottom));
+  display: none;                       /* disembunyikan bila tidak ada item */
+  align-items: center;
+  gap: var(--sp-2);
+}
+.compare-bar.is-active { display: flex; }
+
+.compare-bar__items {
+  display: flex;
+  gap: var(--sp-2);
+  overflow-x: auto;                    /* scroll horizontal bila penuh */
+  flex: 1;
+  min-width: 0;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+  align-items: center;
+}
+.compare-chip {
+  flex: 0 0 auto;                      /* chip tidak menyusut tak karuan */
+  max-width: var(--w-chip-sm);         /* 160px */
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding-inline: var(--sp-2);
+  background: var(--c-surface-alt);
+  border-radius: var(--r-full);
+  font-size: var(--fs-xs);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.compare-chip img { width: 26px; height: 26px; object-fit: contain; flex-shrink: 0; }
+.compare-chip__remove {
+  appearance: none; border: 0; background: transparent;
+  width: 28px; height: 28px;           /* + padding chip ≈ 44px area sentuh */
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--c-text-muted); font-size: var(--fs-md);
+  border-radius: var(--r-full);
+  flex-shrink: 0;
+}
+.compare-chip__remove:hover { background: var(--c-border); color: var(--c-danger); }
+
+.compare-bar__cta {
+  flex-shrink: 0;                      /* tombol Bandingkan tidak pernah tergencet */
+}
+.compare-bar__count { font-size: var(--fs-xs); color: var(--c-text-muted); }
+
+@media (min-width: 1024px) {
+  .compare-bar { padding-inline: var(--sp-5); }
+  .compare-chip { max-width: var(--w-chip); }   /* 240px */
+}
+
+/* Landscape HP pendek: bar lebih ramping agar konten tak tertutup */
+@media (max-height: 460px) and (orientation: landscape) {
+  :root { --h-compare-bar: 52px; }
+  .compare-bar { padding-block: var(--sp-1); }
+}
+
+/* ---------- IKLAN: tidak menutupi konten ---------- */
+.ad-slot {
+  background: var(--c-surface-alt);
+  border: 1px dashed var(--c-border);
+  border-radius: var(--r-md);
+  min-height: 90px;                    /* reserved space → layout tidak melompat */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-text-muted);
+  font-size: var(--fs-xs);
+  overflow: hidden;
+  max-width: 100%;
+}
+.ad-label {
+  font-size: var(--fs-xs);
+  color: var(--c-text-muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+/* Banner in-flow (di antara baris grid) */
+.ad--inline { margin-block: var(--sp-4); }
+
+/* Sticky ad mobile: dibatasi, tidak menutupi seluruh layar,
+   dan dikompensasi dengan padding body agar konten tidak tertutup */
+.ad--sticky-bottom {
+  position: fixed;
+  left: 0; right: 0; bottom: var(--h-compare-bar);
+  z-index: var(--z-ad);
+  max-height: 90px;                    /* hanya strip kecil */
+  margin-inline: auto;
+  width: min(100%, 400px);
+  border-radius: var(--r-md) var(--r-md) 0 0;
+}
+body.has-sticky-ad {
+  padding-bottom: calc(var(--h-compare-bar) + 90px + var(--safe-bottom) + var(--sp-2));
+}
+
+/* Iklan desktop: dalam flow sidebar/kolom, bukan overlay */
+@media (min-width: 1024px) {
+  .ad--sticky-bottom { display: none; }
+  .ad--desktop-sidebar { display: block; width: 100%; }
+}
+@media (max-width: 1023px) {
+  .ad--desktop-sidebar { display: none; }
+}

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Viewport responsif: width device-width + viewport-fit=cover utk safe-area iPhone -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="Gearly — bandingkan spesifikasi elektronik: smartphone, audio, wearable." />
+  <title>Gearly — Katalog Spesifikasi</title>
+
+  <!-- Responsive images: srcset/sizes disiapkan utk density & lebar layout -->
+  <link rel="preload" as="image" imagesrcset="https://placehold.co/400x300?text=Gearly 1x" />
+
+  <link rel="stylesheet" href="src/styles/tokens.css" />
+  <link rel="stylesheet" href="src/styles/base.css" />
+  <link rel="stylesheet" href="src/styles/nav.css" />
+  <link rel="stylesheet" href="src/styles/product.css" />
+  <link rel="stylesheet" href="src/styles/detail.css" />
+  <link rel="stylesheet" href="src/styles/admin.css" />
+</head>
+<body>
+
+  <!-- ================= NAVBAR (compact di mobile) ================= -->
+  <header class="navbar">
+    <a class="navbar__brand" href="index.html">⚙ Gearly</a>
+
+    <!-- Menu desktop (≥1024px) -->
+    <nav class="nav-links" aria-label="Navigasi utama">
+      <a href="index.html" aria-current="page">Katalog</a>
+      <a href="compare.html">Perbandingan</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+
+    <span class="navbar__spacer"></span>
+
+    <!-- Search membesar di desktop: slot ini diisi ulang oleh CSS (searchbar dipindah secara visual lewat flex) -->
+    <div class="searchbar" role="search">
+      <form class="search-form" action="#" method="get" role="search">
+        <label class="visually-hidden" for="search-input">Cari produk atau merek</label>
+        <input id="search-input" class="input" type="search" name="q"
+               placeholder="Cari smartphone, TWS, …" autocomplete="off" />
+        <button type="button" class="btn btn-outline filter-toggle" data-open="filter"
+                aria-haspopup="dialog" aria-controls="filter-sheet">
+          Filter
+        </button>
+      </form>
+    </div>
+
+    <!-- Hamburger hanya < 1024px -->
+    <button class="icon-btn navbar__menu-btn" data-open="menu"
+            aria-label="Buka menu navigasi" aria-controls="menu-drawer" aria-expanded="false">
+      ☰
+    </button>
+  </header>
+
+  <!-- Overlay bersama drawer & bottom sheet -->
+  <div class="overlay" aria-hidden="true"></div>
+
+  <!-- ================= MENU DRAWER (mobile/tablet) ================= -->
+  <nav id="menu-drawer" class="drawer" aria-label="Menu navigasi" aria-hidden="true">
+    <div class="drawer__title">Menu</div>
+    <a href="index.html">Katalog</a>
+    <a href="compare.html">Perbandingan <span class="badge" style="margin-left:auto">0</span></a>
+    <a href="admin.html">Admin Dashboard</a>
+    <button class="menu-item" data-close="menu-drawer">Tutup</button>
+  </nav>
+
+  <!-- ================= FILTER BOTTOM SHEET (mobile/tablet) =================
+       Form filter yang sama akan DIPINDAH ke sidebar saat ≥1024px (ui.js). -->
+  <aside id="filter-sheet" class="bottom-sheet" role="dialog" aria-modal="true"
+         aria-label="Filter produk" aria-hidden="true">
+    <div class="bottom-sheet__handle" aria-hidden="true"></div>
+    <div class="bottom-sheet__header">
+      <strong>Filter</strong>
+      <button class="icon-btn" data-close="filter-sheet" aria-label="Tutup filter">✕</button>
+    </div>
+    <div class="bottom-sheet__body" id="filter-mount"><!-- #filter-form dipasang di sini oleh JS --></div>
+    <div class="bottom-sheet__footer">
+      <button class="btn btn-outline" type="reset" form="filter-form">Reset</button>
+      <button class="btn btn-primary" type="submit" form="filter-form">Terapkan</button>
+    </div>
+  </aside>
+
+  <!-- ================= FORM FILTER (dipakai bottom sheet DAN sidebar) ==========
+       Satu instance saja; ui.js memindahkannya saat melewati 1024px. -->
+  <form id="filter-form" hidden novalidate>
+      <div class="filter-group">
+        <div class="filter-group__title">Kategori</div>
+        <label class="filter-option"><input type="checkbox" name="category" value="smartphone" /> Smartphone</label>
+        <label class="filter-option"><input type="checkbox" name="category" value="audio" /> Audio / TWS</label>
+        <label class="filter-option"><input type="checkbox" name="category" value="wearable" /> Wearable</label>
+        <label class="filter-option"><input type="checkbox" name="category" value="aksesori" /> Aksesori</label>
+      </div>
+      <div class="filter-group">
+        <div class="filter-group__title">Harga maksimum</div>
+        <input class="input" type="number" inputmode="numeric" name="price_max" min="0" step="50000"
+               placeholder="mis. 5.000.000" />
+      </div>
+  </form>
+
+  <main class="container">
+    <h1>Katalog Elektronik</h1>
+    <p id="result-count" aria-live="polite">— produk</p>
+
+    <div class="catalog-layout">
+      <!-- Sidebar filter persisten DESKTOP (≥1024px) -->
+      <aside class="filter-sidebar" aria-label="Filter produk">
+        <h2 style="font-size:var(--fs-base)">Filter</h2>
+        <div id="filter-slot"><!-- #filter-form dipindah ke sini oleh JS --></div>
+        <div class="ad-slot ad--desktop-sidebar" style="margin-top:var(--sp-4)">
+          <span class="ad-label">Iklan · 300×250 (dalam alir, tidak menutupi)</span>
+        </div>
+      </aside>
+
+      <!-- Grid produk -->
+      <section class="catalog-main">
+        <ul class="product-grid" id="product-grid"><!-- diisi JS dari data/products.js --></ul>
+        <p id="empty-state" hidden>Tidak ada produk yang cocok. Coba ubah filter.</p>
+
+        <!-- Iklan in-flow antar baris grid -->
+        <div class="ad-slot ad--inline">
+          <span class="ad-label">Iklan · Banner (tidak menutupi konten)</span>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ================= COMPARE BAR (sticky, usable di layar kecil) ================= -->
+  <div class="compare-bar" role="region" aria-label="Produk yang dibandingkan">
+    <div class="compare-bar__items"></div>
+    <span class="compare-bar__count">0/4</span>
+    <span class="compare-bar__cta">
+      <a class="btn btn-primary" href="compare.html">Bandingkan</a>
+    </span>
+  </div>
+
+  <!-- Sticky ad mobile: strip terbatas; body menambah padding agar konten tak tertutup -->
+  <div class="ad-slot ad--sticky-bottom">
+    <span class="ad-label">Iklan · 320×50</span>
+  </div>
+
+  <footer class="footer">
+    <div class="container footer__cols">
+      <div>
+        <h3>Gearly</h3>
+        <p>Web spesifikasi elektronik. Dibangun mobile-first: Android &amp; iPhone, tablet, hingga monitor 4K.</p>
+      </div>
+      <div>
+        <h3>Jelajahi</h3>
+        <ul>
+          <li><a href="index.html">Katalog</a></li>
+          <li><a href="compare.html">Perbandingan</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Pengelola</h3>
+        <ul><li><a href="admin.html">Admin Dashboard</a></li></ul>
+      </div>
+      <div>
+        <h3>Dukungan</h3>
+        <ul><li><a href="docs/responsive-checklist.html">Checklist Responsif</a></li></ul>
+      </div>
+    </div>
+  </footer>
+
+  <script src="src/data/products.js"></script>
+  <script src="src/js/render.js"></script>
+  <script src="src/js/ui.js"></script>
+</body>
+</html>

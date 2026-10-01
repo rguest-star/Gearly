@@ -1,0 +1,109 @@
+/* ============================================================
+   Gearly — Design Tokens
+   Mobile-first. Semua nilai default = untuk layar TERKECIL.
+   Override dilakukan ke atas (min-width), bukan ke bawah.
+   ============================================================ */
+
+:root {
+  /* ---------- Breakpoints (didesain utk kebutuhan layout) ----------
+     Dipakai di media queries & JS matchMedia. Jangan hardcode angka
+     di tempat lain — selalu rujuk tabel ini.
+
+       sm : 640px  → tablet portrait (grid 2 kolom, filter drawer tetap)
+       md : 768px  → tablet landscape (sidebar mulai muat)
+       lg : 1024px → desktop (navbar full, sidebar filter persisten)
+       xl : 1280px → desktop besar (grid 3–4 kolom)
+       2xl: 1440px → large desktop / 1440p+ (container melebar terkontrol)
+       3xl: 1920px → monitor 4K (max-width container mengunci lebar)
+  ------------------------------------------------------------------ */
+
+  /* Warna */
+  --c-bg:            #f6f7fb;
+  --c-surface:       #ffffff;
+  --c-surface-alt:   #eef1f7;
+  --c-border:        #dde2ec;
+  --c-text:          #1b2333;
+  --c-text-muted:    #5b6577;
+  --c-primary:       #2f6df6;
+  --c-primary-dark:  #1f52c9;
+  --c-on-primary:    #ffffff;
+  --c-accent:        #12b5a5;
+  --c-danger:        #d64545;
+  --c-star:          #f5a623;
+  --c-overlay:       rgba(16, 22, 34, 0.55);
+
+  /* Radius & bayangan */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-full: 999px;
+  --shadow-1: 0 1px 2px rgba(16, 22, 34, .08);
+  --shadow-2: 0 4px 14px rgba(16, 22, 34, .12);
+  --shadow-3: 0 12px 40px rgba(16, 22, 34, .22);
+
+  /* Tipografi — base 16px agar terbaca tanpa zoom */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --fs-xs:   0.75rem;   /* 12px — label kecil, hindari < 12px */
+  --fs-sm:   0.8125rem; /* 13px */
+  --fs-base: 1rem;      /* 16px — JANGAN turunkan di mobile */
+  --fs-md:   1.125rem;  /* 18px */
+  --fs-lg:   1.25rem;   /* 20px */
+  --fs-xl:   1.5rem;    /* 24px */
+  --fs-2xl:  1.875rem;  /* 30px */
+
+  /* Ruang kosong */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 24px; --sp-6: 32px; --sp-7: 48px; --sp-8: 64px;
+
+  /* Lebar komponen kecil (chip, kolom tabel) — selalu ≥ 320px bila diekspresikan px.
+     Ditulis via calc() agar nilai intentif (mis. 15rem = 240px) terbaca jelas. */
+  --w-chip:    calc(15 * var(--sp-4));   /* 240px — chip / kolom tabel maksimum */
+  --w-chip-sm: calc(10 * var(--sp-4));   /* 160px — versi ringkas di layar kecil */
+
+  /* Target sentuh — minimum 44px (iOS HIG / Material) */
+  --touch-target: 44px;
+
+  /* Ketinggian elemen sticky/fixed utk menghitung offset konten */
+  --h-navbar: 56px;              /* mobile: compact + hamburger */
+  --h-compare-bar: 64px;         /* mobile: sticky compare bar */
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  /* Container — max-width konsisten, jangan biarkan teks melebar */
+  --container-pad: var(--sp-4);  /* mobile */
+  --container-max: 100%;         /* mobile: fluid */
+
+  /* Z-index (skala terpusat) */
+  --z-sticky: 40;
+  --z-drawer: 60;
+  --z-modal: 70;
+  --z-ad: 50;
+}
+
+/* Tablet */
+@media (min-width: 640px) {
+  :root {
+    --container-pad: var(--sp-5);
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  :root {
+    --h-navbar: 64px;
+    --container-max: 1200px;
+  }
+}
+
+/* Large desktop */
+@media (min-width: 1440px) {
+  :root {
+    --container-max: 1360px;
+  }
+}
+
+/* Monitor 4K — container TETAP terkunci (1360px), tidak melebar bebas */
+@media (min-width: 1920px) {
+  :root {
+    --container-max: 1440px;
+  }
+}
