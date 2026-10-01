@@ -127,20 +127,26 @@ table.spec-table {
 }
 
 /* Mobile (<768px): render tabel sebagai daftar label→nilai agar tak overflow.
-   Mobile-first: gaya daftar = default; tabel nyata di-restorasi mulai 768px. */
+   Mobile-first: gaya daftar = default; JS melepas kelas .spec-table-list
+   dari wrapper mulai 768px → display bawaan tabel kembali berlaku. */
 table.spec-table thead { display: none; }
-table.spec-table, .spec-table tbody, .spec-table tr, .spec-table th, .spec-table td { display: block; width: 100%; }
+table.spec-table:not(.spec-table-list),
+.spec-table-list table.spec-table,
+.spec-table-list .spec-table tbody,
+.spec-table-list .spec-table tr,
+.spec-table-list .spec-table th,
+.spec-table-list .spec-table td { display: block; width: 100%; }
 .spec-table tr { padding: var(--sp-3) var(--sp-4); }
 .spec-table th { background: transparent; padding: 0 0 2px; font-size: var(--fs-xs); }
 .spec-table td { padding: 0; border: 0; font-size: var(--fs-base); } /* nilai 16px → terbaca tanpa zoom */
 .spec-table .group-row td { padding: var(--sp-2) 0; background: transparent; }
 
 @media (min-width: 768px) {
-  table.spec-table thead { display: table-header-group; }
-  table.spec-table { display: table; }
-  .spec-table tbody { display: table-row-group; }
-  .spec-table tr { display: table-row; padding: 0; }
-  .spec-table th, .spec-table td { display: table-cell; width: auto; }
+  /* ≥768px: JS melepas .spec-table-list pada wrap → selector di atas tidak
+     lagi cocok; hanya `table.spec-table:not(.spec-table-list)` yang tersisa.
+     Aturan ini menetralkannya sehingga tabel memakai display bawaan browser
+     (table / table-header-group / table-row / table-cell). */
+  table.spec-table:not(.spec-table-list) { display: table; }
 }
 
 /* ---------- TABEL PERBANDINGAN ----------

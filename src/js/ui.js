@@ -232,6 +232,23 @@
   var stickyAd = document.querySelector(".ad--sticky-bottom");
   if (stickyAd) document.body.classList.add("has-sticky-ad");
 
+  /* ---------- Tabel spesifikasi: mode daftar <768px / tabel nyata ≥768px ----------
+     CSS hanya mendefinisikan gaya "daftar" (.spec-table-list); kelas ini
+     dipasang/dilepas mengikuti matchMedia supaya di atas 768px tabel
+     memakai display bawaan browser (table / table-header-group / table-cell). */
+  var isTabletUp = mq(BP.md); // 768px
+  function syncSpecTableMode(listMode) {
+    document.querySelectorAll(".spec-table-wrap").forEach(function (w) {
+      w.classList.toggle("spec-table-list", listMode);
+    });
+  }
+  syncSpecTableMode(!isTabletUp.matches);
+  if (isTabletUp.addEventListener) {
+    isTabletUp.addEventListener("change", function (e) { syncSpecTableMode(!e.matches); });
+  } else {
+    isTabletUp.addListener(function (e) { syncSpecTableMode(!e.matches); });
+  }
+
   /* ---------- Kartu horizontal di desktop ----
      Class .card--horizontal hanya berefek ≥1280px (CSS), jadi aman
      dipasang permanen di markup; JS tak perlu memantau resize. */
