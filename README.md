@@ -1,0 +1,2 @@
+# Gearly
+Web spesifikasi elektronik
