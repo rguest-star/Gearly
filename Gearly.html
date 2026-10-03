@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gearly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1C2024; --bg:#F6F5F2; --panel:#FFFFFF; --line:#E1DED7;
+  --accent:#3A5A78; --accent-dark:#2B4459; --muted:#6B6458;
+  font-family:'Inter',system-ui,sans-serif;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --ink:#ECEAE4; --bg:#1B1A17; --panel:#242321; --line:#38362F; --accent:#7FA8C9; --accent-dark:#5C84A6; --muted:#9B9488; }
+}
+:root[data-theme="dark"]{ --ink:#ECEAE4; --bg:#1B1A17; --panel:#242321; --line:#38362F; --accent:#7FA8C9; --accent-dark:#5C84A6; --muted:#9B9488; }
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{height:100%;}
+body{background:var(--bg); color:var(--ink); overflow-x:hidden;}
+img{max-width:100%; display:block;}
+h1,h2,h3{font-family:'Space Grotesk',sans-serif; font-weight:600;}
+.wrap{max-width:1280px; margin:0 auto; padding:0 16px;}
+button{font-family:inherit; cursor:pointer;}
+a{color:inherit;}
+.view{display:none;}
+.view.active{display:block;}
+
+header{position:sticky; top:0; top:env(safe-area-inset-top,0px); z-index:30; background:var(--panel); border-bottom:1px solid var(--line);}
+.nav{display:flex; align-items:center; gap:12px; padding:12px 16px; height:60px; max-width:1280px; margin:0 auto;}
+.logo{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:1.2rem; white-space:nowrap; background:none; border:none; color:inherit;}
+.search-wrap{flex:1; min-width:0; position:relative;}
+.search{width:100%; height:44px; border:1px solid var(--line); border-radius:8px; padding:0 14px; font-size:1rem; background:var(--bg); color:var(--ink);}
+.nav-links{display:none; gap:20px; font-size:0.95rem; white-space:nowrap;}
+.nav-links button{background:none; border:none; color:inherit; font-size:inherit;}
+.icon-btn{width:44px; height:44px; min-width:44px; display:flex; align-items:center; justify-content:center; border:none; background:none; border-radius:8px; color:inherit;}
+.icon-btn:hover{background:var(--bg);}
+.back{font-size:0.9rem; color:var(--muted); background:none; border:none;}
+
+/* ---- Listing view ---- */
+.layout{display:grid; grid-template-columns:1fr; gap:20px; padding:20px 0 100px;}
+.filter-sidebar{display:none;}
+.results-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;}
+.results-count{font-size:0.9rem; color:var(--muted);}
+.filter-trigger{display:flex; align-items:center; gap:8px; height:44px; padding:0 16px; border:1px solid var(--line); border-radius:8px; background:var(--panel); font-size:0.95rem; color:inherit;}
+.grid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px;}
+.card{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:12px; display:flex; flex-direction:column; height:100%;}
+.card-img{aspect-ratio:4/3; background:linear-gradient(135deg,#DCE5EC,#C7D3DD); border-radius:8px; margin-bottom:10px; cursor:pointer;}
+.card .brand{font-size:0.8rem; color:var(--muted);}
+.card .name{font-size:0.95rem; font-weight:600; margin-top:2px; line-height:1.3; min-height:2.6em; cursor:pointer;}
+.card .spec{font-size:0.8rem; color:var(--muted); margin-top:6px;}
+.card .price{font-family:'Space Grotesk',sans-serif; font-weight:600; margin-top:10px; font-size:1.05rem;}
+.card .compare-row{margin-top:auto; padding-top:12px; display:flex; align-items:center; gap:8px;}
+.compare-check{display:flex; align-items:center; gap:8px; font-size:0.85rem; min-height:44px;}
+.compare-check input{width:20px; height:20px;}
+.compare-bar{position:fixed; left:0; right:0; bottom:0; bottom:env(safe-area-inset-bottom,0px); background:var(--accent-dark); color:#fff; padding:10px 16px; display:none; align-items:center; justify-content:space-between; gap:12px; z-index:40;}
+.compare-bar.active{display:flex;}
+.compare-bar .items{font-size:0.85rem; opacity:0.85;}
+.compare-bar button{height:40px; padding:0 16px; border:none; border-radius:8px; background:#fff; color:var(--accent-dark); font-weight:600; font-size:0.9rem;}
+.sheet-overlay{position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:49; display:none;}
+.sheet-overlay.open{display:block;}
+.sheet{position:fixed; left:0; right:0; bottom:0; background:var(--panel); border-radius:16px 16px 0 0; z-index:50; transform:translateY(100%); transition:transform 0.25s ease; max-height:80vh; overflow-y:auto; padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));}
+.sheet.open{transform:translateY(0);}
+.sheet-handle{width:40px; height:4px; background:var(--line); border-radius:2px; margin:0 auto 14px;}
+.filter-group{margin-bottom:18px;}
+.filter-group .label{font-size:0.85rem; color:var(--muted); margin-bottom:8px;}
+.chip-row{display:flex; flex-wrap:wrap; gap:8px;}
+.chip{min-height:44px; padding:0 16px; border:1px solid var(--line); border-radius:20px; display:flex; align-items:center; font-size:0.9rem; background:var(--bg);}
+.filter-check-row{display:flex; flex-direction:column; gap:2px;}
+.filter-check{display:flex; align-items:center; gap:10px; min-height:40px; font-size:0.9rem; cursor:pointer;}
+.filter-check input{width:18px; height:18px; flex-shrink:0;}
+.filter-count{color:var(--muted); font-size:0.8rem; margin-left:auto;}
+.filter-actions{display:flex; gap:10px; margin-top:4px;}
+.filter-reset, .filter-apply-inline{flex:1; height:44px; border-radius:8px; font-weight:600; font-size:0.9rem; border:1px solid var(--line);}
+.filter-reset{background:var(--panel); color:var(--ink);}
+.filter-apply-inline{background:var(--accent); color:#fff; border:none;}
+.sheet-actions{display:flex; gap:10px; margin-top:6px;}
+.sheet-reset{flex:1; height:48px; border:1px solid var(--line); background:var(--panel); color:var(--ink); border-radius:8px; font-weight:600;}
+.sheet-apply{flex:2; height:48px; background:var(--accent); color:#fff; border:none; border-radius:8px; font-weight:600;}
+.drawer{position:fixed; top:0; right:0; bottom:0; width:78%; max-width:320px; background:var(--panel); z-index:50; transform:translateX(100%); transition:transform 0.25s ease; padding:20px 16px; padding-top:calc(20px + env(safe-area-inset-top,0px));}
+.drawer.open{transform:translateX(0);}
+.drawer a, .drawer button{display:block; width:100%; text-align:left; padding:14px 4px; font-size:1rem; border-bottom:1px solid var(--line); background:none; border-left:none; border-right:none; border-top:none; color:inherit;}
+.section{padding:40px 0;}
+.table-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid var(--line); border-radius:10px;}
+table{border-collapse:collapse; width:100%; min-width:640px;}
+th,td{text-align:left; padding:12px 16px; font-size:0.9rem; border-bottom:1px solid var(--line); white-space:nowrap;}
+th{background:var(--bg); font-family:'Space Grotesk',sans-serif; position:sticky; top:0;}
+tr:last-child td{border-bottom:none;}
+
+/* ---- Detail view ---- */
+.product-head{display:grid; grid-template-columns:1fr; gap:18px; padding-top:20px;}
+.product-img{aspect-ratio:4/3; background:linear-gradient(135deg,#DCE5EC,#C7D3DD); border-radius:12px;}
+.dbrand{font-size:0.9rem; color:var(--muted);}
+.pname{font-size:1.5rem; margin-top:4px;}
+.price{font-family:'Space Grotesk',sans-serif; font-size:1.6rem; font-weight:600; margin-top:12px;}
+.price .old{font-size:1rem; color:var(--muted); text-decoration:line-through; font-weight:400; margin-left:8px;}
+.key-specs{margin-top:18px; display:flex; flex-wrap:wrap; gap:10px;}
+.key-spec{background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:8px 14px; font-size:0.85rem;}
+.actions{margin-top:20px; display:flex; gap:12px; flex-wrap:wrap;}
+.btn-primary{height:48px; padding:0 24px; background:var(--accent); color:#fff; border:none; border-radius:8px; font-weight:600; font-size:1rem;}
+.btn-outline{height:48px; min-width:44px; padding:0 20px; border:1px solid var(--line); background:var(--panel); border-radius:8px; font-weight:500; font-size:0.95rem; color:inherit;}
+.spec-table{display:none;}
+.spec-table table{width:100%; border-collapse:collapse; background:var(--panel); border:1px solid var(--line); border-radius:10px; overflow:hidden;}
+.spec-table th, .spec-table td{text-align:left; padding:14px 18px; font-size:0.95rem; border-bottom:1px solid var(--line);}
+.spec-table tr:last-child td{border-bottom:none;}
+.spec-table th{width:35%; color:var(--muted); font-weight:500; background:var(--bg);}
+.spec-table tr.group-row td{font-family:'Space Grotesk',sans-serif; font-weight:600; background:var(--bg); padding-top:16px;}
+.accordion{display:block;}
+.acc-item{background:var(--panel); border:1px solid var(--line); border-radius:10px; margin-bottom:10px; overflow:hidden;}
+.acc-trigger{width:100%; min-height:52px; display:flex; align-items:center; justify-content:space-between; padding:0 16px; background:none; border:none; font-size:1rem; font-weight:500; text-align:left; color:inherit;}
+.acc-trigger .arrow{transition:transform 0.2s ease; color:var(--muted);}
+.acc-item.open .arrow{transform:rotate(180deg);}
+.acc-body{max-height:0; overflow:hidden; transition:max-height 0.25s ease;}
+.acc-item.open .acc-body{max-height:300px;}
+.acc-body ul{list-style:none; padding:0 16px 14px; display:grid; gap:8px;}
+.acc-body li{font-size:0.9rem; color:var(--muted); padding-left:14px; position:relative;}
+.acc-body li::before{content:"›"; position:absolute; left:0; color:var(--accent);}
+
+/* ---- Compare view ---- */
+.cmp-sub{color:var(--muted); font-size:0.95rem; margin:6px 0 22px;}
+.search-clear{position:absolute; right:6px; top:6px; width:36px; height:36px; border:none; background:none; color:var(--muted); font-size:1.1rem; display:none;}
+.search-wrap.has-text .search-clear{display:block;}
+.autocomplete{position:absolute; top:calc(100% + 6px); left:0; right:0; background:var(--panel); border:1px solid var(--line); border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.15); z-index:30; max-height:320px; overflow-y:auto; display:none;}
+.autocomplete.open{display:block;}
+.ac-item{width:100%; text-align:left; padding:12px 14px; border:none; background:none; font-size:0.95rem; display:flex; justify-content:space-between; gap:10px; min-height:44px; align-items:center; color:inherit;}
+.ac-item:hover, .ac-item.active{background:var(--bg);}
+.ac-item .ac-meta{color:var(--muted); font-size:0.85rem;}
+.ac-empty{padding:16px; color:var(--muted); font-size:0.9rem;}
+.compare-desktop{display:none;}
+.compare-desktop table{width:100%; border-collapse:separate; border-spacing:0; background:var(--panel); border:1px solid var(--line); border-radius:12px; overflow:hidden;}
+.compare-desktop th, .compare-desktop td{padding:16px 18px; text-align:left; border-bottom:1px solid var(--line); font-size:0.95rem; vertical-align:top;}
+.compare-desktop thead th{background:var(--bg); font-family:'Space Grotesk',sans-serif;}
+.compare-desktop .spec-label{width:200px; color:var(--muted); font-weight:500; background:var(--bg);}
+.compare-desktop tr:last-child td{border-bottom:none;}
+.col-img{width:70px; height:52px; border-radius:6px; background:linear-gradient(135deg,#DCE5EC,#C7D3DD); margin-bottom:8px;}
+.col-name{font-weight:600; font-size:1rem;}
+.col-price{font-family:'Space Grotesk',sans-serif; font-weight:600; color:var(--accent);}
+.compare-mobile{display:block;}
+.cm-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid var(--line); border-radius:10px; background:var(--panel);}
+.cm-table{border-collapse:separate; border-spacing:0; min-width:640px;}
+.cm-table th, .cm-table td{padding:14px 16px; font-size:0.95rem; border-bottom:1px solid var(--line); white-space:normal; min-width:150px;}
+.cm-table tr:last-child td{border-bottom:none;}
+.cm-table .cm-spec-col{position:sticky; left:0; background:var(--bg); z-index:2; min-width:130px; font-weight:500; color:var(--muted); box-shadow:2px 0 4px rgba(0,0,0,0.08);}
+.cm-table thead th.cm-spec-col{background:var(--bg);}
+.cm-table thead th{background:var(--panel); font-family:'Space Grotesk',sans-serif; font-weight:600;}
+.cm-hint{display:flex; align-items:center; gap:6px; color:var(--muted); font-size:0.85rem; margin-bottom:10px;}
+
+@media (min-width:640px){ .grid{grid-template-columns:repeat(3,1fr);} .nav-links{display:flex;} }
+@media (min-width:1024px){
+  .icon-btn.mobile-only, .drawer, .sheet, .sheet-overlay{display:none !important;}
+  .layout{grid-template-columns:240px 1fr; align-items:start;}
+  .filter-sidebar{display:block; position:sticky; top:76px; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:18px;}
+  .filter-trigger{display:none;}
+  .grid{grid-template-columns:repeat(4,1fr);}
+  .card{flex-direction:row; gap:14px; align-items:flex-start;}
+  .card-img{width:120px; height:90px; aspect-ratio:auto; flex-shrink:0; margin-bottom:0;}
+  .card-body{display:flex; flex-direction:column; min-width:0; flex:1;}
+  .compare-bar{padding:14px 24px;}
+  .product-head{grid-template-columns:420px 1fr; gap:48px; align-items:start;}
+  .product-img{position:sticky; top:96px;}
+  .pname{font-size:1.9rem;}
+  .spec-table{display:block;}
+  .accordion{display:none;}
+  .compare-mobile{display:none;}
+  .compare-desktop{display:block;}
+}
+@media (min-width:1440px){ .wrap{max-width:1360px;} .grid{grid-template-columns:repeat(5,1fr);} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <button class="logo" onclick="goto('listing')">Gearly</button>
+    <div class="search-wrap" id="searchWrap">
+      <input class="search" id="searchInput" type="search" placeholder="Cari laptop, brand, atau model..." autocomplete="off" aria-label="Cari produk">
+      <button class="search-clear" id="searchClear" aria-label="Hapus pencarian">✕</button>
+      <div class="autocomplete" id="autocomplete"></div>
+    </div>
+    <div class="nav-links">
+      <button onclick="goto('listing')">Produk</button>
+      <button onclick="goto('compare')">Bandingkan</button>
+    </div>
+    <button class="icon-btn mobile-only" onclick="toggleDrawer(true)" aria-label="Menu">☰</button>
+  </div>
+</header>
+
+<!-- ===== LISTING VIEW ===== -->
+<main class="wrap view active" id="view-listing">
+  <div class="layout">
+    <aside class="filter-sidebar">
+      <h3 style="margin-bottom:14px; font-size:1.05rem;">Filter</h3>
+      <div id="filterGroupsDesktop"></div>
+      <div class="filter-actions">
+        <button class="filter-reset" onclick="resetFilters()">Reset</button>
+        <button class="filter-apply-inline" onclick="applyFilters()">Terapkan</button>
+      </div>
+    </aside>
+    <section>
+      <div class="results-head">
+        <span class="results-count">6 laptop ditemukan</span>
+        <button class="filter-trigger" onclick="toggleSheet(true)">⚙ Filter</button>
+      </div>
+      <div class="grid" id="productGrid"></div>
+    </section>
+  </div>
+
+  <section class="section" id="bandingkan">
+    <h2 style="margin-bottom:6px;">Tabel Spesifikasi</h2>
+    <p style="color:var(--muted); font-size:0.95rem; margin-bottom:16px;">Geser ke samping untuk melihat kolom lainnya di layar kecil.</p>
+    <div class="table-scroll"><table><thead><tr><th>Model</th><th>Prosesor</th><th>RAM</th><th>Penyimpanan</th><th>Layar</th><th>Baterai</th><th>Harga</th></tr></thead><tbody id="specTable"></tbody></table></div>
+  </section>
+</main>
+
+<!-- ===== DETAIL VIEW ===== -->
+<main class="wrap view" id="view-detail">
+  <button class="back" onclick="goto('listing')" style="margin-top:16px;">← Kembali ke daftar</button>
+  <div class="product-head">
+    <div class="product-img"></div>
+    <div>
+      <div class="dbrand" id="d-brand"></div>
+      <h1 class="pname" id="d-name"></h1>
+      <div class="price" id="d-price"></div>
+      <div class="key-specs" id="d-keyspecs"></div>
+      <div class="actions">
+        <button class="btn-primary">Beli Sekarang</button>
+        <button class="btn-outline" id="d-compare-btn">+ Bandingkan</button>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <h2>Spesifikasi Lengkap</h2>
+    <div class="spec-table"><table><thead><tr><th>Specification</th><th>Value</th></tr></thead><tbody id="specTableBody"></tbody></table></div>
+    <div class="accordion" id="specAccordion"></div>
+  </div>
+</main>
+
+<!-- ===== COMPARE VIEW ===== -->
+<main class="wrap view" id="view-compare">
+  <h1 class="page-title" style="font-size:1.4rem; margin-top:22px;">Bandingkan Laptop</h1>
+  <p class="cmp-sub">Cari dan tambahkan produk di kolom pencarian untuk membandingkan spesifikasi.</p>
+  <div class="compare-desktop"><table id="desktopTable"></table></div>
+  <div class="compare-mobile">
+    <div class="cm-hint">⇆ Geser untuk melihat produk lainnya</div>
+    <div class="cm-scroll"><table class="cm-table" id="mobileTable"></table></div>
+  </div>
+</main>
+
+<div class="compare-bar" id="compareBar">
+  <span class="items" id="compareItems">0 produk dipilih</span>
+  <button onclick="goto('compare')">Bandingkan</button>
+</div>
+
+<div class="sheet-overlay" id="sheetOverlay" onclick="toggleSheet(false)"></div>
+<div class="sheet" id="filterSheet">
+  <div class="sheet-handle"></div>
+  <h3>Filter Produk</h3>
+  <div id="filterGroupsMobile"></div>
+  <div class="sheet-actions">
+    <button class="sheet-reset" onclick="resetFilters()">Reset</button>
+    <button class="sheet-apply" onclick="applyFilters(); toggleSheet(false)">Terapkan</button>
+  </div>
+</div>
+
+<div class="sheet-overlay" id="drawerOverlay" onclick="toggleDrawer(false)" style="display:none;"></div>
+<div class="drawer" id="menuDrawer">
+  <button onclick="goto('listing'); toggleDrawer(false)">Produk</button>
+  <button onclick="goto('compare'); toggleDrawer(false)">Bandingkan</button>
+</div>
+
+<script>
+const products = [
+  {brand:'ASUS', name:'Zenbook 14 OLED', price:'Rp12.500.000', oldPrice:'Rp13.800.000', proc:'Intel Core i5-1340P', ram:'16GB', storage:'512GB SSD', screen:'14" OLED 2.8K', battery:'75Wh',
+    specGroups:[
+      {name:'Layar', items:[{label:'Ukuran & Resolusi', value:'14" OLED 2.8K (2880×1800)'},{label:'Refresh Rate', value:'120Hz'},{label:'Kecerahan', value:'550 nits peak'},{label:'Warna', value:'Dolby Vision, 100% DCI-P3'}]},
+      {name:'Performa', items:[{label:'Prosesor', value:'Intel Core i5-1340P (12 cores)'},{label:'Grafis', value:'Intel Iris Xe Graphics'},{label:'RAM', value:'16GB LPDDR5'},{label:'Penyimpanan', value:'512GB PCIe 4.0 SSD'}]},
+      {name:'Baterai & Konektivitas', items:[{label:'Baterai', value:'75Wh, hingga 14 jam pemakaian'},{label:'Pengisian Daya', value:'Fast charging 65W'},{label:'Nirkabel', value:'Wi-Fi 6E, Bluetooth 5.3'},{label:'Port', value:'2× Thunderbolt 4, 1× USB-A, HDMI 2.1'}]},
+      {name:'Dimensi & Berat', items:[{label:'Dimensi', value:'31.1 × 22.0 × 1.6 cm'},{label:'Berat', value:'1.2 kg'},{label:'Material', value:'Aluminium'}]}
+    ]},
+  {brand:'Lenovo', name:'ThinkPad E14 Gen5', price:'Rp9.800.000', proc:'AMD Ryzen 5 7530U', ram:'8GB', storage:'256GB SSD', screen:'14" FHD', battery:'47Wh'},
+  {brand:'Acer', name:'Swift Go 14', price:'Rp14.200.000', proc:'Intel Core i7-1355U', ram:'16GB', storage:'1TB SSD', screen:'14" 2.8K OLED', battery:'65Wh'},
+  {brand:'HP', name:'Pavilion Aero 13', price:'Rp13.000.000', proc:'AMD Ryzen 7 7735U', ram:'16GB', storage:'512GB SSD', screen:'13.3" WUXGA', battery:'51Wh'},
+  {brand:'ASUS', name:'Vivobook Pro 15', price:'Rp10.400.000', proc:'Intel Core i5-13500H', ram:'8GB', storage:'512GB SSD', screen:'15.6" FHD', battery:'63Wh'},
+  {brand:'Lenovo', name:'Yoga Slim 7i', price:'Rp16.700.000', proc:'Intel Core i7-1360P', ram:'16GB', storage:'1TB SSD', screen:'14" 2.8K OLED', battery:'70Wh'},
+];
+
+let selected = new Set();
+let compared = [products[0], products[2], products[3]];
+let currentDetail = 0;
+const specRows = [{label:'Harga', key:'price'},{label:'Brand', key:'brand'},{label:'Prosesor', key:'proc'},{label:'RAM', key:'ram'},{label:'Penyimpanan', key:'storage'},{label:'Layar', key:'screen'},{label:'Baterai', key:'battery'}];
+
+function goto(view){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  window.scrollTo(0,0);
+  if(view === 'compare') renderCompareTables();
+}
+
+/* ---- Listing ---- */
+const grid = document.getElementById('productGrid');
+const specBody = document.getElementById('specTable');
+const resultsCount = document.querySelector('.results-count');
+
+function renderProductList(list){
+  grid.innerHTML = ''; specBody.innerHTML = '';
+  list.forEach(p => {
+    const i = products.indexOf(p);
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="card-img" onclick="openDetail(${i})"></div>
+      <div class="card-body">
+        <div class="brand">${p.brand}</div>
+        <div class="name" onclick="openDetail(${i})">${p.name}</div>
+        <div class="spec">${p.proc.split(' ').slice(-1)} · ${p.ram} · ${p.storage}</div>
+        <div class="price">${p.price}</div>
+        <div class="compare-row"><label class="compare-check"><input type="checkbox" data-i="${i}" ${selected.has(i)?'checked':''} onchange="toggleCompare(${i})"> Bandingkan</label></div>
+      </div>`;
+    grid.appendChild(card);
+    const row = document.createElement('tr');
+    row.innerHTML = `<td>${p.name}</td><td>${p.proc}</td><td>${p.ram}</td><td>${p.storage}</td><td>${p.screen}</td><td>${p.battery}</td><td>${p.price}</td>`;
+    specBody.appendChild(row);
+  });
+  resultsCount.textContent = list.length + ' laptop ditemukan';
+}
+
+/* ---- Filters ---- */
+const storageOf = p => p.storage.includes('1TB') ? '1TB' : p.storage.slice(0, p.storage.indexOf('GB')+2);
+const filterOptions = {
+  brand: [...new Set(products.map(p => p.brand))],
+  ram: [...new Set(products.map(p => p.ram))].sort((a,b) => parseInt(a)-parseInt(b)),
+  storage: [...new Set(products.map(storageOf))]
+};
+let activeFilters = { brand:new Set(), ram:new Set(), storage:new Set() };
+let pendingFilters = { brand:new Set(), ram:new Set(), storage:new Set() };
+
+function filterGroupHTML(prefix){
+  const groupLabel = {brand:'Brand', ram:'RAM', storage:'Storage'};
+  return Object.keys(filterOptions).map(key => `
+    <div class="filter-group">
+      <div class="label">${groupLabel[key]}</div>
+      <div class="filter-check-row">
+        ${filterOptions[key].map(val => `
+          <label class="filter-check">
+            <input type="checkbox" data-group="${key}" value="${val}" id="${prefix}-${key}-${val}" onchange="onFilterCheck(this)">
+            ${val}
+          </label>`).join('')}
+      </div>
+    </div>`).join('');
+}
+document.getElementById('filterGroupsDesktop').innerHTML = filterGroupHTML('fd');
+document.getElementById('filterGroupsMobile').innerHTML = filterGroupHTML('fm');
+
+function onFilterCheck(el){
+  const key = el.dataset.group, val = el.value;
+  if(el.checked) pendingFilters[key].add(val); else pendingFilters[key].delete(val);
+  // keep desktop/mobile checkbox sets in sync
+  ['fd','fm'].forEach(prefix => {
+    const other = document.getElementById(`${prefix}-${key}-${val}`);
+    if(other && other !== el) other.checked = el.checked;
+  });
+}
+
+function applyFilters(){
+  activeFilters = { brand:new Set(pendingFilters.brand), ram:new Set(pendingFilters.ram), storage:new Set(pendingFilters.storage) };
+  const filtered = products.filter(p =>
+    (activeFilters.brand.size === 0 || activeFilters.brand.has(p.brand)) &&
+    (activeFilters.ram.size === 0 || activeFilters.ram.has(p.ram)) &&
+    (activeFilters.storage.size === 0 || activeFilters.storage.has(storageOf(p)))
+  );
+  renderProductList(filtered);
+}
+
+function resetFilters(){
+  pendingFilters = { brand:new Set(), ram:new Set(), storage:new Set() };
+  document.querySelectorAll('#filterGroupsDesktop input, #filterGroupsMobile input').forEach(cb => cb.checked = false);
+  applyFilters();
+}
+
+renderProductList(products);
+
+function toggleCompare(i){
+  if(selected.has(i)) selected.delete(i); else selected.add(i);
+  const bar = document.getElementById('compareBar');
+  document.getElementById('compareItems').textContent = selected.size + ' produk dipilih';
+  bar.classList.toggle('active', selected.size > 0);
+  if(selected.size > 0){
+    compared = Array.from(selected).slice(-4).map(idx => products[idx]);
+  }
+}
+function toggleSheet(open){ document.getElementById('filterSheet').classList.toggle('open', open); document.getElementById('sheetOverlay').classList.toggle('open', open); }
+function toggleDrawer(open){ document.getElementById('menuDrawer').classList.toggle('open', open); document.getElementById('drawerOverlay').style.display = open ? 'block' : 'none'; }
+
+/* ---- Detail ---- */
+function openDetail(i){
+  currentDetail = i;
+  const p = products[i];
+  document.getElementById('d-brand').textContent = p.brand;
+  document.getElementById('d-name').textContent = p.name;
+  document.getElementById('d-price').innerHTML = p.price + (p.oldPrice ? ` <span class="old">${p.oldPrice}</span>` : '');
+  document.getElementById('d-keyspecs').innerHTML = [p.proc, p.ram + ' RAM', p.storage, p.screen].map(s => `<span class="key-spec">${s}</span>`).join('');
+  document.getElementById('d-compare-btn').onclick = () => { selected.add(i); toggleCompare2(i); };
+
+  const groups = p.specGroups || [{name:'Spesifikasi', items:[{label:'Prosesor', value:p.proc},{label:'RAM', value:p.ram},{label:'Penyimpanan', value:p.storage},{label:'Layar', value:p.screen},{label:'Baterai', value:p.battery}]}];
+  const tableBody = document.getElementById('specTableBody');
+  const accordion = document.getElementById('specAccordion');
+  tableBody.innerHTML = ''; accordion.innerHTML = '';
+  groups.forEach(group => {
+    const groupRow = document.createElement('tr');
+    groupRow.className = 'group-row';
+    groupRow.innerHTML = `<td colspan="2">${group.name}</td>`;
+    tableBody.appendChild(groupRow);
+    group.items.forEach(item => {
+      const row = document.createElement('tr');
+      row.innerHTML = `<th>${item.label}</th><td>${item.value}</td>`;
+      tableBody.appendChild(row);
+    });
+    const acc = document.createElement('div');
+    acc.className = 'acc-item';
+    acc.innerHTML = `<button class="acc-trigger" onclick="this.parentElement.classList.toggle('open')">${group.name} <span class="arrow">⌄</span></button><div class="acc-body"><ul>${group.items.map(it => `<li>${it.value}</li>`).join('')}</ul></div>`;
+    accordion.appendChild(acc);
+  });
+  goto('detail');
+}
+function toggleCompare2(i){
+  const bar = document.getElementById('compareBar');
+  document.getElementById('compareItems').textContent = selected.size + ' produk dipilih';
+  bar.classList.toggle('active', selected.size > 0);
+  compared = Array.from(selected).slice(-4).map(idx => products[idx]);
+}
+
+/* ---- Compare ---- */
+function renderCompareTables(){
+  const dt = document.getElementById('desktopTable');
+  let head = '<thead><tr><th class="spec-label">Spesifikasi</th>' + compared.map(p => `<th><div class="col-img"></div><div class="col-name">${p.name}</div><div style="color:var(--muted); font-size:0.85rem;">${p.brand}</div></th>`).join('') + '</tr></thead>';
+  let body = '<tbody>' + specRows.map(r => `<tr><td class="spec-label">${r.label}</td>` + compared.map(p => `<td${r.key==='price' ? ' class="col-price"' : ''}>${p[r.key]}</td>`).join('') + '</tr>').join('') + '</tbody>';
+  dt.innerHTML = head + body;
+  const mt = document.getElementById('mobileTable');
+  let mhead = '<thead><tr><th class="cm-spec-col">Spesifikasi</th>' + compared.map(p => `<th>${p.name}</th>`).join('') + '</tr></thead>';
+  let mbody = '<tbody>' + specRows.map(r => `<tr><td class="cm-spec-col">${r.label}</td>` + compared.map(p => `<td>${p[r.key]}</td>`).join('') + '</tr>').join('') + '</tbody>';
+  mt.innerHTML = mhead + mbody;
+}
+
+/* ---- Search + autocomplete (works across all views → always leads to compare add or detail open) ---- */
+const input = document.getElementById('searchInput');
+const wrap = document.getElementById('searchWrap');
+const clearBtn = document.getElementById('searchClear');
+const ac = document.getElementById('autocomplete');
+let activeIndex = -1;
+let currentMatches = [];
+
+function updateAutocomplete(){
+  const q = input.value.trim().toLowerCase();
+  wrap.classList.toggle('has-text', q.length > 0);
+  if(!q){ ac.classList.remove('open'); ac.innerHTML=''; currentMatches=[]; return; }
+  currentMatches = products.filter(p => p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q));
+  activeIndex = -1;
+  ac.innerHTML = currentMatches.length === 0
+    ? '<div class="ac-empty">Tidak ada produk ditemukan</div>'
+    : currentMatches.map((p,i) => `<button type="button" class="ac-item" data-i="${i}">${p.name}<span class="ac-meta">${p.brand}</span></button>`).join('');
+  ac.classList.add('open');
+}
+function selectProduct(p){
+  const i = products.indexOf(p);
+  input.value = ''; wrap.classList.remove('has-text'); ac.classList.remove('open');
+  openDetail(i);
+}
+input.addEventListener('input', updateAutocomplete);
+input.addEventListener('focus', updateAutocomplete);
+input.addEventListener('keydown', (e) => {
+  const items = ac.querySelectorAll('.ac-item');
+  if(e.key === 'ArrowDown'){ e.preventDefault(); activeIndex = Math.min(activeIndex+1, items.length-1); items.forEach((it,i)=>it.classList.toggle('active', i===activeIndex)); }
+  else if(e.key === 'ArrowUp'){ e.preventDefault(); activeIndex = Math.max(activeIndex-1, 0); items.forEach((it,i)=>it.classList.toggle('active', i===activeIndex)); }
+  else if(e.key === 'Enter'){ e.preventDefault(); if(activeIndex >= 0 && currentMatches[activeIndex]) selectProduct(currentMatches[activeIndex]); else if(currentMatches.length === 1) selectProduct(currentMatches[0]); }
+  else if(e.key === 'Escape'){ ac.classList.remove('open'); }
+});
+ac.addEventListener('click', (e) => { const btn = e.target.closest('.ac-item'); if(btn) selectProduct(currentMatches[btn.dataset.i]); });
+clearBtn.addEventListener('click', () => { input.value=''; wrap.classList.remove('has-text'); ac.classList.remove('open'); input.focus(); });
+document.addEventListener('click', (e) => { if(!wrap.contains(e.target)) ac.classList.remove('open'); });
+</script>
+</body>
+</html>
